@@ -44,9 +44,9 @@ class MatrixUtilTest(unittest.TestCase):
         assert expected.is_equivalent_to(actual)
 
     def test_intersection_2(self):
-        fa1 = regex_util.regex_to_min_dfa("AB")
+        fa1 = regex_util.regex_string_to_min_dfa("AB")
         am1 = AdjacencyMatrix(fa1)
-        fa2 = regex_util.regex_to_min_dfa("BC")
+        fa2 = regex_util.regex_string_to_min_dfa("BC")
         am2 = AdjacencyMatrix(fa2)
 
         expected = NondeterministicFiniteAutomaton()
