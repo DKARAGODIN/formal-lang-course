@@ -5,13 +5,23 @@ from pyformlang.regular_expression import Regex
 from pyformlang.finite_automaton import DeterministicFiniteAutomaton, NondeterministicFiniteAutomaton
 
 
-def regex_to_min_dfa(regex_str: str) -> DeterministicFiniteAutomaton:
+def regex_string_to_min_dfa(regex_string: str) -> DeterministicFiniteAutomaton:
     """
-    Create DFA based on the regex
+    Create DFA based on the regex string
     :param regex_str: DFA will be created based on this Regex
     :return: DFA
     """
-    return Regex(regex_str).to_epsilon_nfa().minimize()
+    return Regex(regex_string).to_epsilon_nfa().minimize()
+
+def regex_to_min_dfa(regex: Regex) -> DeterministicFiniteAutomaton:
+    """
+    Create DFA based on the Regex
+    :param regex_str: DFA will be created based on this Regex
+    :return: DFA
+    """
+    return regex.to_epsilon_nfa().minimize()
+
+
 
 
 def graph_to_nfa(graph: nx.Graph, start_set: Set = None, final_set: Set = None) -> NondeterministicFiniteAutomaton:

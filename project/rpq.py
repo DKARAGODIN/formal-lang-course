@@ -17,7 +17,7 @@ def rpq_to_graph_tc(graph: nx.MultiDiGraph, query: str, start_nodes: set = None,
     :return: Regular Path Query as set
     """
     nfa = regex_util.graph_to_nfa(graph, start_nodes, final_nodes)
-    dfa = regex_util.regex_to_min_dfa(query)
+    dfa = regex_util.regex_string_to_min_dfa(query)
     graph_matrix = AdjacencyMatrix(nfa)
     query_matrix = AdjacencyMatrix(dfa)
     intersected_matrix = intersect_adjacency_matrices(graph_matrix, query_matrix)
@@ -45,7 +45,7 @@ def rpq_to_graph_bfs(
     """
 
     nfa = regex_util.graph_to_nfa(graph, start_nodes, final_nodes)
-    dfa = regex_util.regex_to_min_dfa(query)
+    dfa = regex_util.regex_string_to_min_dfa(query)
     graph_matrix = AdjacencyMatrix(nfa)
     query_matrix = AdjacencyMatrix(dfa)
     symbols = graph_matrix.matrix.keys().__and__(query_matrix.matrix.keys())
@@ -86,7 +86,7 @@ def rpq_to_graph_bfs_all_reachable(
     """
 
     nfa = regex_util.graph_to_nfa(graph, start_nodes, final_nodes)
-    dfa = regex_util.regex_to_min_dfa(query)
+    dfa = regex_util.regex_string_to_min_dfa(query)
     graph_matrix = AdjacencyMatrix(nfa)
     query_matrix = AdjacencyMatrix(dfa)
     symbols = graph_matrix.matrix.keys().__and__(query_matrix.matrix.keys())
