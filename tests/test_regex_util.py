@@ -2,7 +2,7 @@ import unittest
 from networkx import MultiDiGraph, MultiGraph
 
 from project.g_util import build_two_cycle_labeled_graph, read_graph_from_file
-from project.regex_util import regex_to_min_dfa, graph_to_nfa
+from project.regex_util import regex_string_to_min_dfa, graph_to_nfa
 from pyformlang.finite_automaton import Symbol, State, DeterministicFiniteAutomaton, NondeterministicFiniteAutomaton
 
 
@@ -12,7 +12,7 @@ class RegexUtilDFATest(unittest.TestCase):
 
     def test_creating_min_dfa_from_regex(self):
         test_regex = "a b"
-        actual = regex_to_min_dfa(test_regex)
+        actual = regex_string_to_min_dfa(test_regex)
 
         state_0 = State(0)
         state_1 = State(1)
@@ -31,7 +31,7 @@ class RegexUtilDFATest(unittest.TestCase):
 
     def test_min_dfa_language(self):
         test_regex = "a b"
-        dfa = regex_to_min_dfa(test_regex)
+        dfa = regex_string_to_min_dfa(test_regex)
         accepted = [
             [Symbol("a"), Symbol("b")]
         ]
@@ -47,7 +47,7 @@ class RegexUtilDFATest(unittest.TestCase):
 
     def test_creating_min_dfa_from_regex_with_star(self):
         test_regex = "a b c*"
-        actual = regex_to_min_dfa(test_regex)
+        actual = regex_string_to_min_dfa(test_regex)
 
         state_0 = State(0)
         state_1 = State(1)
@@ -68,7 +68,7 @@ class RegexUtilDFATest(unittest.TestCase):
 
     def test_min_dfa_language_with_star(self):
         test_regex = "a* b* c* d*"
-        dfa = regex_to_min_dfa(test_regex)
+        dfa = regex_string_to_min_dfa(test_regex)
         accepted = [
             [Symbol("a")], [Symbol("b")], [Symbol("c")], [Symbol("d")],
             [Symbol("a"), Symbol("a")], [Symbol("a"), Symbol("b")],
