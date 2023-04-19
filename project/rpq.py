@@ -6,7 +6,8 @@ from scipy import sparse
 import networkx as nx
 
 import project.regex_util as regex_util
-from project.context_free_grammar_util import cfg_to_weak_cnf
+from project.context_free_grammar_util import cfg_to_weak_cnf, get_cfg_from_file
+from project.g_util import load_graph
 from project.matrix_util import AdjacencyMatrix, intersect_adjacency_matrices, _get_front, _get_reachable_states
 
 
@@ -124,6 +125,12 @@ def rpq_to_graph_bfs_all_reachable(
         }
 
     return {start.value: {end.value for end in ends} for (start, ends) in result.items()}
+
+
+def context_free_path_query_from_file(graph: str, cfg: str) -> Set:
+    graph_as_MultiDiGrpah = load_graph(graph)
+    cfg_as_cfg = get_cfg_from_file(cfg)
+    return context_free_path_query(graph_as_MultiDiGrpah, cfg_as_cfg)
 
 
 def context_free_path_query(graph: nx.MultiDiGraph, cfg: CFG,
