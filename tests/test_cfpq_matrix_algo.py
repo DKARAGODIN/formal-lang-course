@@ -1,10 +1,12 @@
 import unittest
 
 from pyformlang.cfg import CFG
-from project.g_util import build_two_cycle_labeled_graph
-from project.rpq import context_free_path_query
 
-class HellingsTest(unittest.TestCase):
+from project.cfpq import cfpq
+from project.g_util import build_two_cycle_labeled_graph
+
+
+class CfpqMatrixAlgoTest(unittest.TestCase):
     def setUp(self):
         pass
 
@@ -12,7 +14,8 @@ class HellingsTest(unittest.TestCase):
         cfg = "S -> epsilon"
         graph = build_two_cycle_labeled_graph(1, 1, ("a", "b"))
         expected = {(0, 0), (1, 1), (2, 2)}
-        assert context_free_path_query(graph, CFG.from_text(cfg)) == expected
+        actual = cfpq(graph, CFG.from_text(cfg), "matrix")
+        assert actual == expected
 
     def test_2(self):
         cfg = """
@@ -21,7 +24,8 @@ class HellingsTest(unittest.TestCase):
             """
         graph = build_two_cycle_labeled_graph(1, 1, ("a", "b"))
         expected = {(0, 0), (0, 1), (1, 0), (1, 1), (2, 2)}
-        assert context_free_path_query(graph, CFG.from_text(cfg)) == expected
+        actual = cfpq(graph, CFG.from_text(cfg), "matrix")
+        assert actual == expected
 
     def test_3(self):
         cfg = """
@@ -31,4 +35,14 @@ class HellingsTest(unittest.TestCase):
             """
         graph = build_two_cycle_labeled_graph(2, 1, ("a", "b"))
         expected = {(0, 0), (0, 3), (1, 0), (1, 3), (2, 0), (2, 3)}
-        assert context_free_path_query(graph, CFG.from_text(cfg), {0, 1, 2, 3}, {0, 1, 2, 3}) == expected
+        actual = cfpq(graph, CFG.from_text(cfg), "matrix", {0, 1, 2, 3}, {0, 1, 2, 3})
+        assert actual == expected
+
+    def test_4(self):
+        cfg = """
+        S -> S b | epsilon
+        """
+        graph = build_two_cycle_labeled_graph(1, 1, ("a", "b"))
+        expected = {(0, 0), (0, 2), (1, 1), (2, 0), (2, 2)}
+        actual = cfpq(graph, CFG.from_text(cfg), "matrix")
+        assert actual == expected
