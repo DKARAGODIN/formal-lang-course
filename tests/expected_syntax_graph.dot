@@ -1,0 +1,11 @@
+digraph tree {
+1 [label=program];
+1 -> 2;
+2 [label=stmt];
+2 -> 3;
+3 [label=bind];
+3 -> 4;
+4 [label=expr];
+4 -> 5;
+5 [label=val];
+}

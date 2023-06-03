@@ -1,6 +1,6 @@
-from typing import Set
+from typing import Set, Iterable
 
-from pyformlang.finite_automaton import NondeterministicFiniteAutomaton, State
+from pyformlang.finite_automaton import NondeterministicFiniteAutomaton, State, Symbol, EpsilonNFA
 from scipy import sparse
 from scipy.sparse._compressed import _cs_matrix
 
@@ -166,3 +166,44 @@ def _get_reachable_states(first_matrix: AdjacencyMatrix, second_matrix: Adjacenc
         for i in reachable.nonzero()[1]
         if i in map(lambda state: first_matrix.index_by_state(state), first_matrix.final_states)
     )
+
+def iterate_nfa(fa: EpsilonNFA) -> Iterable[tuple[State, Symbol, State]]:
+    for u, t in fa.to_dict().items():
+        for s, vs in t.items():
+            try:
+                for v in vs:
+                    yield u, s, v
+            except TypeError:
+                yield u, s, vs
+
+def concat(a: EpsilonNFA, b: EpsilonNFA) -> EpsilonNFA:
+    """
+    Build NFA of concatenation of specified NFAs.
+    """
+
+    a_states = {st: 3 + i for i, st in enumerate(a.states)}
+    b_states = {st: 3 + len(a.states) + i for i, st in enumerate(b.states)}
+    s, st, t = 0, 1, 2
+
+    result = EpsilonNFA(
+        states=set({s, t} | a_states.keys() | b_states.keys()),
+        input_symbols=set(a.symbols | b.symbols),
+        start_state={s},
+        final_states={t},
+    )
+
+    result.add_transitions(
+        [(a_states[u], l, a_states[v]) for u, l, v in iterate_nfa(a)]
+    )
+
+    result.add_transitions(
+        [(b_states[u], l, b_states[v]) for u, l, v in iterate_nfa(b)]
+    )
+
+    result.add_transitions([(s, "epsilon", a_states[x]) for x in a.start_states])
+    result.add_transitions([(a_states[x], "epsilon", st) for x in a.final_states])
+
+    result.add_transitions([(st, "epsilon", b_states[x]) for x in b.start_states])
+    result.add_transitions([(b_states[x], "epsilon", t) for x in b.final_states])
+
+    return result

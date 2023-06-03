@@ -221,7 +221,7 @@ class RegexUtilNFATest(unittest.TestCase):
             ]
         )
 
-        two_cycles_graph = read_graph_from_file("expected_2_cycles_graph")
+        two_cycles_graph = read_graph_from_file("expected_2_cycles_graph.dot")
         actual = graph_to_nfa(two_cycles_graph, start_states, final_states)
         assert actual.is_equivalent_to(expected)
         assert not actual.is_deterministic()
