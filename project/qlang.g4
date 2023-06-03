@@ -1,101 +1,55 @@
 grammar qlang;
 
+fragment W: [a-zA-Z_];
+fragment D: [0-9];
+fragment WD: (W|D);
+fragment S: [ \t\r\n\u000C];
+
+INT_NUMBER: [1-9][0-9]*|'0';
+STRING: '"' ('\\'. | (~'"')+)* '"';
+NAME: W WD*;
+WS: S+ -> skip;
+
 program: (stmt)* EOF;
+stmt: (print | bind) ';';
+print: 'print' value=expr;
+bind: 'bind' name=NAME '=' value=expr;
 
-stmt: (print | bind) SEMICOLON;
-
-print: PRINT expr;
-bind: var ASSIGN expr;
-
-
-expr: LP expr RP
-    | var
-    | val
-    | lambda
-    | SET_START LP (list | expr) COMMA expr RP
-    | SET_FINAL LP (list | expr) COMMA expr RP
-    | ADD_START LP (list | expr) COMMA expr RP
-    | ADD_FINAL LP (list | expr) COMMA expr RP
-    | GET_START LP expr RP
-    | GET_FINAL LP expr RP
-    | GET_REACHABLE LP expr RP
-    | GET_VERTICES LP expr RP
-    | GET_EDGES LP expr RP
-    | GET_LABELS LP expr RP
-    | MAP LP lambda COMMA expr RP
-    | FILTER LP lambda COMMA expr RP
-    | LOAD LP string RP
-    | expr INTERSECT expr
-    | expr CONCAT expr
-    | expr UNION expr
-    | expr IN expr
-    | expr EQUAL expr
-    | expr NOT_EQUAL expr
+expr: '(' expr ')'                               # expr_expr
+    | name=NAME                                  # expr_var
+    | val                                        # expr_val
+    | lambda                                     # expr_lambda
+    | 'setStart' '(' to=expr ',' start=expr ')'  # expr_set_start
+    | 'setFinal' '(' to=expr ',' final=expr ')'  # expr_set_final
+    | 'addStart' '(' to=expr ',' start=expr ')'  # expr_add_start
+    | 'addFinal' '(' to=expr ',' final=expr ')'  # expr_add_final
+    | 'getStart' '(' value=expr ')'              # expr_get_start
+    | 'getFinal' '(' value=expr ')'              # expr_get_final
+    | 'getReachable' '(' value=expr ')'          # expr_get_reachable
+    | 'getVertices' '(' value=expr ')'           # expr_get_vertices
+    | 'getEdges' '(' value=expr ')'              # expr_get_edge
+    | 'getLabels' '(' value=expr ')'              # expr_get_labels
+    | 'map' '(' lambda ',' expr ')'               # expr_map
+    | 'filter' '(' lambda ',' expr ')'            # expr_filter
+    | 'load' '(' value=STRING ')'                 # expr_load
+    | left=expr '&&' right=expr                   # expr_intersect
+    | left=expr '||' right=expr                   # expr_concat
+    | left=expr 'in' right=expr                   # expr_in
+    | left=expr '==' right=expr                   # expr_equal
+    | left=expr '!=' right=expr                   # expr_not_equal
     ;
 
-lambda: lambda_def LP var RP ARROW LB expr RB;
-
-lambda_def: 'lam';
-var: CHAR*;
+lambda: 'lam' '(' var=NAME ')' '->' '{' body=expr '}';
 
 val:
-    string
-  | int
-  | vertex
-  | edge
-  | graph
-  | bool
+    value=STRING # literal_string
+  | value=INT_NUMBER # literal_int
+  | set # literal_list
   ;
 
-bool: TRUE | FALSE;
-string: QUOT (CHAR | DIGIT)* QUOT;
-int: DIGIT+;
-vertex: int;
-edge: LP int COMMA string COMMA int RP;
-graph: LP list COMMA list RP;
-elem: string | int | vertex | edge | bool | var;
-list: LB RB | LB elem ( COMMA elem )* RB;
+vertex: INT_NUMBER;
+edge: '(' INT_NUMBER ',' STRING ',' INT_NUMBER ')';
+graph: '(' set ',' set ')';
+set: '{' '}' | '{' elems+=expr ( ',' elems+=expr )* '}';
 
-DIGIT: [0-9];
-CHAR: [a-zA-Z];
-
-QUOT: '"';
-EQUAL: '==';
-NOT_EQUAL: '!=';
-ASSIGN: '=';
-PRINT: 'print';
-TRUE: 'true';
-FALSE: 'false';
-SEMICOLON: ';';
-COMMA: ',';
-LP: '(';
-RP: ')';
-LB: '{';
-RB: '}';
-
-SET_START: 'setStart';
-SET_FINAL: 'setFinal';
-ADD_START: 'addStart';
-ADD_FINAL: 'addFinal';
-GET_START: 'getStart';
-GET_FINAL: 'getFinal';
-GET_REACHABLE: 'getReachable';
-GET_VERTICES: 'getVertices';
-GET_EDGES: 'getEdges';
-GET_LABELS: 'getLabels';
-
-MAP: 'map';
-FILTER: 'filter';
-LOAD: 'load';
-
-
-KLEENE: '*';
-ARROW: '->';
-INTERSECT: '&';
-CONCAT: '||';
-UNION: '|';
-IN: 'in';
 COMMENT: '//' ~[\n]* -> skip;
-
-
-
